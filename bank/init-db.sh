@@ -13,3 +13,17 @@ else
     echo "Creating and starting a new container: $CONTAINER_NAME"
     docker run -d --name $CONTAINER_NAME -p 6379:6379 $DOCKER_IMAGE
 fi
+
+
+MONGO_CONTAINER_NAME="my-mongo-db"
+MONGO_PORT=27017
+MONGO_DATABASE="transactions"
+
+# Check if the container is already running
+if [[ "$(docker ps -q -f name=$MONGO_CONTAINER_NAME)" ]]; then
+    echo "MongoDB container is already running"
+else
+    # Run the MongoDB container
+    docker run -d --name $MONGO_CONTAINER_NAME -p $MONGO_PORT:27017 -e MONGO_INITDB_DATABASE=$MONGO_DATABASE mongo
+    echo "MongoDB container started"
+fi
