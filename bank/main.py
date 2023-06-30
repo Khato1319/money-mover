@@ -1,9 +1,9 @@
 from typing import Union
 import repository
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Path, Query
 from pydantic import BaseModel, constr
 
-CBU_REGEX = r"^[0-9]+$"
+CBU_REGEX = r"^[0-9]{22}$"
 
 
 class PostAccount(BaseModel):
@@ -16,10 +16,6 @@ class PostTransaction(BaseModel):
 
 app = FastAPI()
 
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 @app.get("/accounts/{cbu}")
 def get_account_handler(cbu: str= Path(..., regex=CBU_REGEX)):
@@ -39,5 +35,9 @@ def post_transaction(transaction: PostTransaction, cbu: str = Path(..., regex=CB
     FUNDS_OBJ = repository.add_transaction(transaction.cbu, cbu, transaction.amount)
     return FUNDS_OBJ
 
+@app.get("/accounts/{cbu}/transactions")
+def post_transaction(cbu: str = Path(..., regex=CBU_REGEX), page: int = Query(1, ge=1)):
+    TRANSACTIONS = repository.get_transactions(cbu, page)
+    return TRANSACTIONS
 
 
