@@ -25,8 +25,8 @@ fi
 sleep 5
 
   # Define the SQL statements to create the tables
-  SQL_CREATE_TABLE_1="CREATE TABLE IF NOT EXISTS Users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, pwd_hash VARCHAR(100) NOT NULL, email VARCHAR(255) NOT NULL UNIQUE, phone_number VARCHAR(12) NOT NULL UNIQUE, cuit VARCHAR(13) NOT NULL UNIQUE);"
-  SQL_CREATE_TABLE_2="CREATE TABLE IF NOT EXISTS PaymentMethods (money_key VARCHAR(255) PRIMARY KEY, bank_name TEXT NOT NULL, bank_cbu VARCHAR(22) NOT NULL UNIQUE, user_id INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES Users(id));"
+  SQL_CREATE_TABLE_1="CREATE TABLE IF NOT EXISTS Users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, pwd_hash VARCHAR(100) NOT NULL, email VARCHAR(320) NOT NULL UNIQUE, phone_number VARCHAR(12) NOT NULL UNIQUE, cuit VARCHAR(13) NOT NULL UNIQUE);"
+  SQL_CREATE_TABLE_2="CREATE TABLE IF NOT EXISTS PaymentMethods (money_key VARCHAR(320) PRIMARY KEY, bank_name TEXT NOT NULL, bank_cbu VARCHAR(22) NOT NULL UNIQUE, user_id INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES Users(id));"
 
   # Execute the SQL statements inside the container
   docker exec -it "$POSTGRES_CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
@@ -35,7 +35,7 @@ sleep 5
 
 
 MONGO_CONTAINER_NAME="moneymover-transactions-mongo"
-MONGO_PORT=27017
+MONGO_PORT=27018
 MONGO_DATABASE="transactions_db"
 COLLECTION_NAME="transactions"
 

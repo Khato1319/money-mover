@@ -40,7 +40,21 @@ def _paginate(page_number, values):
 
     return values[start_index:end_index]
 
+def modify_funds(cbu: str, amount: float):
+    FUNDS_STRING = r.hget(BANK_ACCOUNTS, cbu)
+    if FUNDS_STRING is None:
+        raise HTTPException(status_code=404, detail="Account not found")
+    funds = float(FUNDS_STRING)
+    funds += amount
+    if funds < 0:
+        raise HTTPException(status_code=403, detail="Insufficient funds")
+    r.hset(BANK_ACCOUNTS, cbu, funds)
+    return {"funds": funds}
+
+
 def add_transaction(cbu_from: str, cbu_to: str, amount: float):
+    if cbu_from == cbu_to:
+        raise HTTPException(status_code=400, detail="Transactions have to be between different accounts")
     FUNDS_STRING = r.hget(BANK_ACCOUNTS, cbu_to)
     if FUNDS_STRING is None:
         raise HTTPException(status_code=404, detail="Account not found")
@@ -50,9 +64,9 @@ def add_transaction(cbu_from: str, cbu_to: str, amount: float):
         raise HTTPException(status_code=403, detail="Insufficient funds")
     r.hset(BANK_ACCOUNTS, cbu_to, funds)
     TRANSACTION = {
-        "from": cbu_from,
-        "to": cbu_to,
-        "amount": amount,
+        "from": cbu_from if amount > 0 else cbu_to,
+        "to": cbu_to if amount > 0 else cbu_from,
+        "amount": abs(amount),
         "date": datetime.now()
     }
     collection.update_one({"cbu": cbu_to}, {"$push": {"transactions": {"$each": [TRANSACTION], "$position": 0}}})

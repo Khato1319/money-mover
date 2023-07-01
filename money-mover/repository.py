@@ -32,7 +32,7 @@ cursor = connection.cursor()
 
 # Connect to MongoDB
 # Create a MongoClient instance
-client = MongoClient("mongodb://localhost:27017")
+client = MongoClient("mongodb://localhost:27018")
 
 # Access a specific database
 db = client["transactions_db"]
@@ -82,6 +82,8 @@ def _formatted_bank_details(bank_details: dict):
     return f"{bank_details['name']} - {bank_details['bank_cbu']} ({bank_details['bank_name']})"
 
 def add_transaction(money_key_from: str, money_key_to: str, amount: float):
+    if (amount < 0):
+        raise HTTPException(status_code=400, detail="Transfer amounts have to be positive")
     MONEY_KEY_FROM_DETAILS = _get_details_from_money_key(money_key_from)
     MONEY_KEY_TO_DETAILS = _get_details_from_money_key(money_key_to)
 
@@ -142,6 +144,7 @@ def _cbu_exists(cbu: str):
 def add_money_key(user_id: int, cbu: str, type: str):
     if _cbu_exists(cbu):
         raise HTTPException(status_code=409, detail="CBU is already registered with another key")
+    bank_api._is_cbu_valid(cbu)
     MONEY_KEY = _validate_and_get_money_key(user_id, type)
     BANK_NAME = bank_api.get_bank_name(cbu)
     QUERY = "INSERT INTO PaymentMethods VALUES (%(money_key)s, %(bank_name)s, %(bank_cbu)s, %(user_id)s)"
@@ -166,7 +169,7 @@ def get_user(user_id: int ):
         "phone_number": USER_DATA[0][4],
         "cuit": USER_DATA[0][5],
     }
-    TO_RETURN["payment_methods"] = reduce(lambda prev, next: [*prev, {"money_key": next[6], "bank_name": next[7]}], USER_DATA, [])
+    TO_RETURN["payment_methods"] = reduce(lambda prev, next: prev if next[6] is None else [*prev, {"money_key": next[6], "bank_name": next[7]}], USER_DATA, [])
     return TO_RETURN
 
 

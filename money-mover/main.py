@@ -3,7 +3,7 @@ import repository
 from fastapi import FastAPI, HTTPException, Path, Query
 from pydantic import BaseModel, constr
 
-EMAIL_REGEX=r'^[\w\.-]+@[\w\.-]+\.\w+$'
+EMAIL_REGEX=r'^[\w\.-]{0,64}@[\w\.-]+\.\w{0,255}$'
 PHONE_REGEX=r"^[0-9]{10}$"
 CUIT=r"^[0-9]{2}-[0-9]{8}-[0-9]$"
 CBU_REGEX = r"^[0-9]{22}$"
@@ -53,8 +53,8 @@ def post_money_key(money_key: PostMoneyKey, user_id: int = Path(..., ge=1)):
 
 @app.post("/users/transactions")
 def post_transaction(transaction: PostTransaction):
-    FUNDS_OBJ = repository.add_transaction(transaction.origin_money_key, transaction.dest_money_key, transaction.amount)
-    return FUNDS_OBJ
+    TRANSACTION_OBJ = repository.add_transaction(transaction.origin_money_key, transaction.dest_money_key, transaction.amount)
+    return TRANSACTION_OBJ
 
 @app.get("/users/{user_id}/transactions")
 def get_transactions(user_id: int = Path(..., ge=1), page: int = Query(1, ge=1)):
