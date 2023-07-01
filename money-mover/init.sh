@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pip install uvicorn fastapi pymongo pydantic python-dotenv psycopg2
+pip install uvicorn fastapi pymongo pydantic python-dotenv psycopg2 PyJWT
 
 # Define the Docker container and PostgreSQL connection details
 POSTGRES_CONTAINER_NAME="moneymover-users-paymentmethods-postgres"

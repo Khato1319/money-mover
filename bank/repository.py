@@ -4,7 +4,7 @@ import random
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from fastapi import HTTPException
-from datetime import datetime
+import datetime
 
 # Load environment variables from .env file
 load_dotenv()
@@ -26,6 +26,9 @@ client = MongoClient("mongodb://localhost:27017")
 # Access a specific database
 db = client["transactions_db"]
 collection = db["transactions"]
+
+
+
 
 
 def _paginate(page_number, values):
@@ -67,7 +70,7 @@ def add_transaction(cbu_from: str, cbu_to: str, amount: float):
         "from": cbu_from if amount > 0 else cbu_to,
         "to": cbu_to if amount > 0 else cbu_from,
         "amount": abs(amount),
-        "date": datetime.now()
+        "date": datetime.datetime.now()
     }
     collection.update_one({"cbu": cbu_to}, {"$push": {"transactions": {"$each": [TRANSACTION], "$position": 0}}})
     return {"funds": funds, "transaction": TRANSACTION}

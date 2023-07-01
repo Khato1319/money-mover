@@ -1,6 +1,8 @@
 import repository
 from fastapi import FastAPI, HTTPException, Path, Query
 from pydantic import BaseModel, constr
+import os
+import jwt
 
 CBU_REGEX = r"^[0-9]{22}$"
 
@@ -11,10 +13,23 @@ class PostAccount(BaseModel):
 class PostTransaction(BaseModel):
     cbu: constr(regex = CBU_REGEX)
     amount: float
+    token: str
 
 class PostAmount(BaseModel):
     amount: float
+    token: str
 
+def _validate_jwt(token):
+    SECRET = os.getenv('SECRET')
+    try:
+        payload = jwt.decode(token, SECRET, algorithms=['HS256'])
+        return payload
+    except jwt.ExpiredSignatureError:
+        # Token has expired
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        # Invalid token
+        return HTTPException(status_code=401, detail="Invalid token")
 
 app = FastAPI()
 
@@ -38,6 +53,7 @@ def post_account(account: PostAccount):
 
 @app.post("/accounts/{cbu}/transactions")
 def post_transaction(transaction: PostTransaction, cbu: str = Path(..., regex=CBU_REGEX)):
+    _validate_jwt(transaction.token)
     FUNDS_OBJ = repository.add_transaction(transaction.cbu, cbu, transaction.amount)
     return FUNDS_OBJ
 

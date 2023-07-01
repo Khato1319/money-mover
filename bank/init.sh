@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pip install uvicorn redis fastapi pymongo pydantic python-dotenv
+pip install uvicorn redis fastapi pymongo pydantic python-dotenv PyJWT
 
 CONTAINER_NAME="my-redis-container"
 DOCKER_IMAGE="redis"

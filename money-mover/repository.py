@@ -3,7 +3,8 @@ import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from fastapi import HTTPException
-from datetime import datetime
+import datetime
+import jwt
 import bank_api
 from functools import reduce
 import random
@@ -59,6 +60,8 @@ SPANISH_NOUNS = [
 ]
 
 
+
+
 def _paginate(page_number, values):
     total_pages = (len(values) + PAGE_SIZE - 1) // PAGE_SIZE
     if page_number > total_pages:
@@ -102,7 +105,7 @@ def add_transaction(money_key_from: str, money_key_to: str, amount: float, passw
         "to": _formatted_bank_details(MONEY_KEY_TO_DETAILS),
         "dest_money_key": money_key_to,
         "amount": amount,
-        "date": datetime.now()
+        "date": datetime.datetime.now()
     }
     collection.update_one({"user_id": MONEY_KEY_TO_DETAILS['user_id']}, {"$push": {"transactions": {"$each": [TRANSACTION], "$position": 0}}})
     if MONEY_KEY_FROM_DETAILS['user_id'] != MONEY_KEY_TO_DETAILS['user_id']:

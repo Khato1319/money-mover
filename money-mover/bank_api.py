@@ -1,6 +1,8 @@
 import os
 from fastapi import HTTPException
 import requests
+import jwt
+import datetime
 
 def _get_bank_details(cbu: str):
     BANK_DETAILS = os.getenv(cbu[:7])
@@ -18,14 +20,21 @@ def _is_cbu_valid(cbu: str):
     if response.status_code >= 400:
         raise HTTPException(status_code=response.status_code, detail=response.json()['detail'])
 
+def _generate_jwt_token():
+    SECRET = os.getenv('SECRET')
+    payload = {"role": "ADMIN"}
+    payload['exp'] = datetime.datetime.utcnow() + datetime.timedelta(seconds=60)
+    return jwt.encode(payload, SECRET, algorithm='HS256')
+
 
 def get_bank_name(cbu: str):
     return _get_bank_details(cbu)['name']
 
 def _bank_transaction(cbu_from: str, cbu_to: str, amount: float):
+    TOKEN = _generate_jwt_token()
     BASE_URL = _get_bank_details(cbu_to)['HOST']
     URL = f"{BASE_URL}/accounts/{cbu_to}/transactions"
-    BODY = {"cbu": cbu_from, "amount": amount}
+    BODY = {"cbu": cbu_from, "amount": amount, "token": TOKEN}
     try:
         requests.get(f"{BASE_URL}/health")
         response = requests.post(URL, json=BODY)
