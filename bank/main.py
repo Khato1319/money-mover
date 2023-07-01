@@ -1,4 +1,3 @@
-from typing import Union
 import repository
 from fastapi import FastAPI, HTTPException, Path, Query
 from pydantic import BaseModel, constr
