@@ -22,6 +22,7 @@ else
     -e POSTGRES_DB="$POSTGRES_DB" \
     -p 5433:5432 \
     postgres
+  sleep 10
 fi
 
 sleep 5

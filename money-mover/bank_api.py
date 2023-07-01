@@ -10,13 +10,13 @@ def _get_bank_details(cbu: str):
     return {'name': SPLITTED[0], 'HOST': SPLITTED[1]}
 
 def _is_cbu_valid(cbu: str):
+    URL = _get_bank_details(cbu)['HOST'] + f"/accounts/{cbu}"
     try:
-        URL = _get_bank_details(cbu)['HOST'] + f"/accounts/{cbu}"
         response = requests.get(URL)
-        if response.status_code >= 400:
-            raise HTTPException(status_code=response.status_code, detail=response.json()['detail'])
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=503, detail="Bank service is not up")
+    if response.status_code >= 400:
+        raise HTTPException(status_code=response.status_code, detail=response.json()['detail'])
 
 
 def get_bank_name(cbu: str):
@@ -29,10 +29,10 @@ def _bank_transaction(cbu_from: str, cbu_to: str, amount: float):
     try:
         requests.get(f"{BASE_URL}/health")
         response = requests.post(URL, json=BODY)
-        if response.status_code >= 400:
-            raise HTTPException(status_code=response.status_code, detail=response.json()['detail'])
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=503, detail="Bank service is not up")
+    if response.status_code >= 400:
+        raise HTTPException(status_code=response.status_code, detail=response.json()['detail'])
 
 def send_money(cbu_from: str, cbu_to: str, amount: float):
     _is_cbu_valid(cbu_from)
