@@ -7,6 +7,7 @@ from datetime import datetime
 import bank_api
 from functools import reduce
 import random
+import hashlib
 
 
 # Load environment variables from .env file
@@ -81,7 +82,7 @@ def _get_details_from_money_key(money_key: str):
 def _formatted_bank_details(bank_details: dict):
     return f"{bank_details['name']} - {bank_details['bank_cbu']} ({bank_details['bank_name']})"
 
-def add_transaction(money_key_from: str, money_key_to: str, amount: float):
+def add_transaction(money_key_from: str, money_key_to: str, amount: float, password: str):
     if (amount < 0):
         raise HTTPException(status_code=400, detail="Transfer amounts have to be positive")
     MONEY_KEY_FROM_DETAILS = _get_details_from_money_key(money_key_from)
@@ -89,6 +90,9 @@ def add_transaction(money_key_from: str, money_key_to: str, amount: float):
 
     if MONEY_KEY_FROM_DETAILS is None or MONEY_KEY_TO_DETAILS is None:
         raise HTTPException(status_code=404, detail="MoneyKey not found")
+
+    if not _is_password_correct(MONEY_KEY_FROM_DETAILS["user_id"], password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     bank_api.send_money(MONEY_KEY_FROM_DETAILS['bank_cbu'], MONEY_KEY_TO_DETAILS['bank_cbu'], amount)
     
@@ -179,12 +183,20 @@ def _exists_user(email: str, phone_number: str, cuit: str):
     RESULT = cursor.fetchone()
     return RESULT[0] > 0
 
+def _is_password_correct(user_id: int, password: str):
+    QUERY = "SELECT * FROM Users WHERE id = %(user_id)s"
+    cursor.execute(QUERY, {"user_id": user_id})
+    PWD_HASH = cursor.fetchone()[2]
+    HASH = hashlib.sha256(password.encode()).hexdigest()
+    return HASH == PWD_HASH
+
+
 
 def create_account(name: str, password: str, email: str, phone_number: str, cuit: str):
     if _exists_user(email, phone_number, cuit):
         raise HTTPException(status_code=409, detail="User already registered")
     QUERY = "INSERT INTO Users (name , pwd_hash, email, phone_number, cuit) VALUES (%(name)s, %(password)s, %(email)s, %(phone_number)s, %(cuit)s) RETURNING id"
-    cursor.execute(QUERY, {"name": name, "password": password, "email": email, "phone_number": phone_number, "cuit": cuit})
+    cursor.execute(QUERY, {"name": name, "password": hashlib.sha256(password.encode()).hexdigest(), "email": email, "phone_number": phone_number, "cuit": cuit})
 
     USER_ID = cursor.fetchone()[0] 
     connection.commit()

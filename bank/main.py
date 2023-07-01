@@ -38,7 +38,7 @@ def post_account(account: PostAccount):
 
 @app.post("/accounts/{cbu}/transactions")
 def post_transaction(transaction: PostTransaction, cbu: str = Path(..., regex=CBU_REGEX)):
-    FUNDS_OBJ = repository.add_transaction(cbu, transaction.cbu, transaction.amount)
+    FUNDS_OBJ = repository.add_transaction(transaction.cbu, cbu, transaction.amount)
     return FUNDS_OBJ
 
 @app.get("/accounts/{cbu}/transactions")

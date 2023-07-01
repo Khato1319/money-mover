@@ -20,6 +20,7 @@ class PostTransaction(BaseModel):
     origin_money_key: str
     dest_money_key: str
     amount: float
+    password: str
 
 class PostMoneyKey(BaseModel):
     cbu: constr(regex = CBU_REGEX)
@@ -53,7 +54,7 @@ def post_money_key(money_key: PostMoneyKey, user_id: int = Path(..., ge=1)):
 
 @app.post("/users/transactions")
 def post_transaction(transaction: PostTransaction):
-    TRANSACTION_OBJ = repository.add_transaction(transaction.origin_money_key, transaction.dest_money_key, transaction.amount)
+    TRANSACTION_OBJ = repository.add_transaction(transaction.origin_money_key, transaction.dest_money_key, transaction.amount, transaction.password)
     return TRANSACTION_OBJ
 
 @app.get("/users/{user_id}/transactions")
