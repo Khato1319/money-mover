@@ -13,6 +13,7 @@ def _is_cbu_valid(cbu: str):
     URL = _get_bank_details(cbu)['HOST'] + f"/accounts/{cbu}"
     try:
         response = requests.get(URL)
+        print(response)
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=503, detail="Bank service is not up")
     if response.status_code >= 400:
