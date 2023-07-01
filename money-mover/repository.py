@@ -40,7 +40,7 @@ collection = db["transactions"]
 
 SPANISH_NOUNS = [
     "amor", "amistad", "familia", "vida", "persona", "casa", "trabajo", "tiempo", "dia", "noche",
-    "mes", "año", "mujer", "hombre", "niño", "niña", "bebé", "perro", "gato", "animal",
+    "mes", "año", "mujer", "hombre", "niño", "niña", "bebe", "perro", "gato", "animal",
     "naturaleza", "ciudad", "pais", "mar", "montaña", "rio", "sol", "luna", "estrella",
     "aire", "viento", "fuego", "agua", "tierra", "flores", "arbol", "fruta", "verdura",
     "comida", "bebida", "plato", "taza", "ropa", "zapatos", "sombrero", "camisa", "pantalon",
