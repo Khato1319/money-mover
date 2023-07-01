@@ -46,6 +46,8 @@ def add_transaction(cbu_from: str, cbu_to: str, amount: float):
         raise HTTPException(status_code=404, detail="Account not found")
     funds = float(FUNDS_STRING)
     funds += amount
+    if funds < 0:
+        raise HTTPException(status_code=403, detail="Insufficient funds")
     r.hset(BANK_ACCOUNTS, cbu_to, funds)
     TRANSACTION = {
         "from": cbu_from,
@@ -60,7 +62,7 @@ def get_transactions(cbu: str, page: int):
     TRANSACTIONS_DOC = collection.find_one({"cbu": cbu})
     if TRANSACTIONS_DOC is None:
         HTTPException(status_code=404, detail="Account not found")
-    return _paginate(page, TRANSACTIONS_DOC["transactions"])
+    return {"transactions":_paginate(page, TRANSACTIONS_DOC["transactions"])}
 
 def get_account(cbu: str ):
     FUNDS = r.hget(BANK_ACCOUNTS, cbu)

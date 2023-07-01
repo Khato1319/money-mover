@@ -18,14 +18,14 @@ app = FastAPI()
 
 
 @app.get("/accounts/{cbu}")
-def get_account_handler(cbu: str= Path(..., regex=CBU_REGEX)):
+def get_account(cbu: str= Path(..., regex=CBU_REGEX)):
     ACCOUNT = repository.get_account(cbu)
     if ACCOUNT is None:
         raise HTTPException(status_code=404, detail="Item not found")
     return ACCOUNT
 
 @app.post("/accounts")
-def post_account_handler(account: PostAccount):
+def post_account(account: PostAccount):
     CBU_OBJ = repository.create_account(account.name)
     return CBU_OBJ
 
@@ -36,7 +36,7 @@ def post_transaction(transaction: PostTransaction, cbu: str = Path(..., regex=CB
     return FUNDS_OBJ
 
 @app.get("/accounts/{cbu}/transactions")
-def post_transaction(cbu: str = Path(..., regex=CBU_REGEX), page: int = Query(1, ge=1)):
+def get_transactions(cbu: str = Path(..., regex=CBU_REGEX), page: int = Query(1, ge=1)):
     TRANSACTIONS = repository.get_transactions(cbu, page)
     return TRANSACTIONS
 

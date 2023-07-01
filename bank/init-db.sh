@@ -21,13 +21,15 @@ MONGO_DATABASE="transactions_db"
 COLLECTION_NAME="transactions"
 
 # Check if the container is already running
-if [[ "$(docker ps -q -f name=$MONGO_CONTAINER_NAME)" ]]; then
+if [[ "$(docker ps -a -q -f name=$MONGO_CONTAINER_NAME)" ]]; then
     echo "MongoDB container is already running"
+    docker start $MONGO_CONTAINER_NAME
 else
     # Run the MongoDB container
     docker run -d --name $MONGO_CONTAINER_NAME -p $MONGO_PORT:27017 -e MONGO_INITDB_DATABASE=$MONGO_DATABASE mongo
     echo "MongoDB container started"
 fi
 
+sleep 5
 
 docker exec -it $MONGO_CONTAINER_NAME mongosh $MONGO_DATABASE --eval "db.$COLLECTION_NAME.createIndex({ cbu: 1 })" --quiet
