@@ -15,6 +15,8 @@ SUFFIX_LEN = 15
 
 # Connect to Redis
 r = redis.Redis(host='localhost', port=6379, db=0)
+r.config_set('appendonly', 'yes')
+
 BANK_ACCOUNTS = "Bank_Accounts"
 USER_DATA = "User_Data"
 
