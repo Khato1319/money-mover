@@ -1,2 +1,4 @@
 bank/.env
 money-mover/.env
+bank/__pycache__
+money-mover/__pycache__
