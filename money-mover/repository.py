@@ -148,7 +148,9 @@ def _cbu_exists(cbu: str):
     cursor.execute(QUERY, {"bank_cbu": cbu})
     return cursor.fetchone()[0] > 0
 
-def add_money_key(user_id: int, cbu: str, type: str):
+def add_money_key(user_id: int, password: str, cbu: str, type: str):
+    if not _is_password_correct(user_id, password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
     if _cbu_exists(cbu):
         raise HTTPException(status_code=409, detail="CBU is already registered with another key")
     bank_api._is_cbu_valid(cbu)
