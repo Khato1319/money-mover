@@ -25,6 +25,7 @@ class PostTransaction(BaseModel):
 class PostMoneyKey(BaseModel):
     cbu: constr(regex = CBU_REGEX)
     type: constr(regex=MONEY_KEY_TYPE_REGEX)
+    password: str
 
 
 app = FastAPI()
@@ -49,7 +50,7 @@ def post_user(account: PostUser):
 
 @app.post("/users/{user_id}/money_keys")
 def post_money_key(money_key: PostMoneyKey, user_id: int = Path(..., ge=1)):
-    MONEY_KEY_OBJ = repository.add_money_key(user_id, money_key.cbu, money_key.type)
+    MONEY_KEY_OBJ = repository.add_money_key(user_id, money_key.cbu, money_key.type, money_key.password)
     return MONEY_KEY_OBJ
 
 @app.post("/users/transactions")

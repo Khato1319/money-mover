@@ -148,7 +148,9 @@ def _cbu_exists(cbu: str):
     cursor.execute(QUERY, {"bank_cbu": cbu})
     return cursor.fetchone()[0] > 0
 
-def add_money_key(user_id: int, cbu: str, type: str):
+def add_money_key(user_id: int, cbu: str, type: str, password: str):
+    if not _is_password_correct(user_id, password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
     if _cbu_exists(cbu):
         raise HTTPException(status_code=409, detail="CBU is already registered with another key")
     bank_api._is_cbu_valid(cbu)
@@ -163,7 +165,7 @@ def add_money_key(user_id: int, cbu: str, type: str):
 def get_transactions(user_id: int, page: int):
     TRANSACTIONS_DOC = collection.find_one({"user_id": user_id})
     if TRANSACTIONS_DOC is None:
-        HTTPException(status_code=404, detail="Account not found")
+        raise HTTPException(status_code=404, detail="Account not found")
     return {"transactions":_paginate(page, TRANSACTIONS_DOC["transactions"])}
 
 def get_user(user_id: int ):
@@ -189,7 +191,10 @@ def _exists_user(email: str, phone_number: str, cuit: str):
 def _is_password_correct(user_id: int, password: str):
     QUERY = "SELECT * FROM Users WHERE id = %(user_id)s"
     cursor.execute(QUERY, {"user_id": user_id})
-    PWD_HASH = cursor.fetchone()[2]
+    maybe_result = cursor.fetchone()
+    if maybe_result is None:
+        raise HTTPException(404, detail="User not found")
+    PWD_HASH = maybe_result[2]
     HASH = hashlib.sha256(password.encode()).hexdigest()
     return HASH == PWD_HASH
 
