@@ -64,6 +64,7 @@ def get_transactions(cbu: str = Path(..., regex=CBU_REGEX), page: int = Query(1,
 
 @app.post("/accounts/{cbu}/funds")
 def deposit_or_withdraw_money(amount: PostAmount, cbu: str = Path(..., regex=CBU_REGEX)):
+    _validate_jwt(amount.token)
     FUNDS_OBJ = repository.modify_funds(cbu, amount.amount)
     return FUNDS_OBJ
 
