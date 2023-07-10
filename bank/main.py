@@ -29,7 +29,7 @@ def _validate_jwt(token):
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         # Invalid token
-        return HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 app = FastAPI()
 
