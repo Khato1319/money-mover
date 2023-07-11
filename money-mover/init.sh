@@ -22,10 +22,9 @@ else
     -e POSTGRES_DB="$POSTGRES_DB" \
     -p 5433:5432 \
     postgres
-  sleep 10
 fi
 
-sleep 5
+sleep 15
 
   # Define the SQL statements to create the tables
   SQL_CREATE_TABLE_1="CREATE TABLE IF NOT EXISTS Users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, pwd_hash VARCHAR(100) NOT NULL, email VARCHAR(320) NOT NULL UNIQUE, phone_number VARCHAR(12) NOT NULL UNIQUE, cuit VARCHAR(13) NOT NULL UNIQUE);"
