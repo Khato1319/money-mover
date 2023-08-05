@@ -1,6 +1,6 @@
 # Money Mover
 
-## Code Spaces initialition with a bank
+## Code Spaces initialization with a bank
 
 To simulate a bank, create a code space, and execute the following commands:
 
@@ -27,7 +27,7 @@ Then, run the followings commands
 Then, click the pop-up to make it public and go to the Ports tab. Copy the local address of port 8000 and open it in a new browser tab, adding `/docs` at the end of the path.
 
 
-## Code Spaces initialition with money-mover
+## Code Spaces initialization with money-mover
 
 To simulate money-mover, create a code space, and execute the following commands:
 
